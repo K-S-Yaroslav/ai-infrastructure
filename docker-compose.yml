@@ -1,0 +1,91 @@
+services:
+  ollama:
+    image: ollama/ollama:0.4.7
+    container_name: ai_engine
+    runtime: nvidia
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./ollama_data:/root/.ollama
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - OLLAMA_NUM_PARALLEL=2
+      - OLLAMA_MAX_LOADED_MODELS=2
+      - OLLAMA_KEEP_ALIVE=24h
+      - OLLAMA_ORIGINS=*
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: ai_orchestrator
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    environment:
+      N8N_HOST: margin-oxidizing-deviation.ngrok-free.dev
+      N8N_PROTOCOL: https
+      N8N_PORT: 5678
+      WEBHOOK_URL: https://margin-oxidizing-deviation.ngrok-free.dev
+      N8N_WEBHOOK_URL: https://margin-oxidizing-deviation.ngrok-free.dev
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_HOST: db
+      DB_POSTGRESDB_PORT: 5432
+      DB_POSTGRESDB_DATABASE: n8n_db
+      DB_POSTGRESDB_USER: n8n_admin
+      DB_POSTGRESDB_PASSWORD: MySecurePass2026
+      N8N_METRICS: "true"
+      N8N_ENCRYPTION_KEY: change-this-to-random-32-chars
+    volumes:
+      - ./n8n_data:/home/node/.n8n
+    depends_on:
+      - db
+      - ollama
+
+  db:
+    image: postgres:16-alpine
+    container_name: ai_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: n8n_admin
+      POSTGRES_PASSWORD: MySecurePass2026
+      POSTGRES_DB: n8n_db
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U n8n_admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  qdrant:
+    image: qdrant/qdrant:v1.9.0
+    container_name: ai_memory
+    restart: unless-stopped
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - ./qdrant_data:/qdrant/storage
+
+  redis:
+    image: redis:7-alpine
+    container_name: ai_cache
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis_data:/data
+    command: redis-server --appendonly yes --requirepass MyRedisPass2026
+
+networks:
+  default:
+    name: ai_network
