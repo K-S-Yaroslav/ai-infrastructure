@@ -11,7 +11,7 @@
       "type": "n8n-nodes-base.telegramTrigger",
       "typeVersion": 1.2,
       "position": [
-        -288,
+        -384,
         -240
       ],
       "id": "e33d1dda-f4a2-406f-bdd1-5ebc9f5f2cf9",
@@ -27,14 +27,17 @@
     {
       "parameters": {
         "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
-        "text": "={{ $json.output }}",
-        "additionalFields": {}
+        "text": "={{ $json.text }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_web_page_preview": false
+        }
       },
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        160,
-        -240
+        64,
+        -144
       ],
       "id": "1475e8cd-c06c-4fe1-ace9-c91a6b98e688",
       "name": "Send a text message",
@@ -48,26 +51,8 @@
     },
     {
       "parameters": {
-        "model": "qwen2.5:7b-instruct-q4_K_M",
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
-      "typeVersion": 1,
-      "position": [
-        -144,
-        -16
-      ],
-      "id": "20e951ed-5add-4ec4-b667-503e33409211",
-      "name": "Ollama Chat Model1",
-      "credentials": {
-        "ollamaApi": {
-          "id": "J8uainAP3VchWnHP",
-          "name": "Ollama account"
-        }
-      }
-    },
-    {
-      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
         "messages": {
           "messageValues": [
             {
@@ -84,11 +69,73 @@
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.9,
       "position": [
-        -144,
-        -240
+        -192,
+        -368
       ],
       "id": "4eaa6cfb-00eb-4dea-972b-0d731c94bbc7",
       "name": "Manager"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "ОТВЕЧАЙ ТОЛЬКО НА РУССКОМ ЯЗЫКЕ. Используй только кириллицу.  Ты — эксперт-исполнитель. У тебя есть план от руководителя.  Твоя задача: 1. Напиши подробный, качественный ответ, строго следуя плану 2. Используй точные факты и данные 3. Раскрой каждый пункт плана полно и информативно"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -224,
+        -144
+      ],
+      "id": "0552d0a3-5c45-49b3-a36c-d5264e0c59b3",
+      "name": "Worker"
+    },
+    {
+      "parameters": {
+        "model": "qwen2.5:7b-instruct-q4_K_M",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        -272
+      ],
+      "id": "20e951ed-5add-4ec4-b667-503e33409211",
+      "name": "Ollama Chat Manager",
+      "credentials": {
+        "ollamaApi": {
+          "id": "J8uainAP3VchWnHP",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "qwen2.5:7b-instruct-q4_K_M",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        -48
+      ],
+      "id": "a37c4823-e7de-453e-a730-a2e520d05c21",
+      "name": "Ollama Chat Worker",
+      "credentials": {
+        "ollamaApi": {
+          "id": "J8uainAP3VchWnHP",
+          "name": "Ollama account"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -104,7 +151,34 @@
         ]
       ]
     },
-    "Ollama Chat Model1": {
+    "Manager": {
+      "main": [
+        [
+          {
+            "node": "Worker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    },
+    "Worker": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Manager": {
       "ai_languageModel": [
         [
           {
@@ -115,24 +189,24 @@
         ]
       ]
     },
-    "Manager": {
-      "main": [
+    "Ollama Chat Worker": {
+      "ai_languageModel": [
         [
           {
-            "node": "Send a text message",
-            "type": "main",
+            "node": "Worker",
+            "type": "ai_languageModel",
             "index": 0
           }
         ]
       ]
     }
   },
-  "active": true,
+  "active": false,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "5dd66b34-e9a0-4b4c-87ee-c9476cd6c1a2",
+  "versionId": "967fc27b-7bb2-4f6b-904d-94256d24ebe2",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "ada5bffac26132224180e7ae95041d80fdc3d37610db6f3137c83ce8199900d3"
