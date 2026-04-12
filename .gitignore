@@ -1,0 +1,35 @@
+# Secret & Environment
+.env
+*.token
+*.key
+*.pem
+
+# Data directories (содержит sensitive данные и большие данные)
+*_data/
+*.sql
+*.sqlite
+backups/
+
+# n8n specific
+n8n_data/config
+n8n_data/database.sqlite
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
