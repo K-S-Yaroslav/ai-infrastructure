@@ -47,3 +47,6 @@ generate-secrets:
 	@echo "REDIS_PASSWORD=$$(openssl rand -hex 8)"
 	@echo "=========================="
 	@echo "Скопируйте эти значения в ваш .env файл"
+
+export-workflow:
+	@./scripts/export-workflow.sh
