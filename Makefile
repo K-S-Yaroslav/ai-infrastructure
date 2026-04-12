@@ -38,3 +38,12 @@ restore:
 	else \
 		echo "Файл $(FILE) не найден"; \
 	fi
+
+generate-secrets:
+	@echo "=== Генерация секретов ==="
+	@echo "N8N_ENCRYPTION_KEY=$$(openssl rand -hex 16)"
+	@echo "WEBUI_SECRET_KEY=$$(openssl rand -hex 32)"
+	@echo "QDRANT_API_KEY=$$(openssl rand -hex 16)"
+	@echo "REDIS_PASSWORD=$$(openssl rand -hex 8)"
+	@echo "=========================="
+	@echo "Скопируйте эти значения в ваш .env файл"
