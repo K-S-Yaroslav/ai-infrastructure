@@ -1,0 +1,142 @@
+{
+  "name": "multi-agent-workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -288,
+        -240
+      ],
+      "id": "e33d1dda-f4a2-406f-bdd1-5ebc9f5f2cf9",
+      "name": "Telegram Trigger",
+      "webhookId": "23fdaf07-250f-4afb-875c-c7eff54e5dfe",
+      "credentials": {
+        "telegramApi": {
+          "id": "nmOsCFPvXI0BQU8Y",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        160,
+        -240
+      ],
+      "id": "1475e8cd-c06c-4fe1-ace9-c91a6b98e688",
+      "name": "Send a text message",
+      "webhookId": "743dbd56-b167-4770-8e56-30793300166b",
+      "credentials": {
+        "telegramApi": {
+          "id": "nmOsCFPvXI0BQU8Y",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "qwen2.5:7b-instruct-q4_K_M",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        -16
+      ],
+      "id": "20e951ed-5add-4ec4-b667-503e33409211",
+      "name": "Ollama Chat Model1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "J8uainAP3VchWnHP",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "messages": {
+          "messageValues": [
+            {
+              "message": "ОТВЕЧАЙ ТОЛЬКО НА РУССКОМ ЯЗЫКЕ. Используй только кириллицу.  Ты — руководитель-аналитик. Твоя задача: 1. Проанализировать запрос пользователя 2. Составить чёткий план ответа из 3-5 пунктов 3. НЕ пиши сам ответ — только план  Формат вывода: ПЛАН: 1. [Пункт 1] 2. [Пункт 2] ..."
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "message": "={{ $json.message.text }}"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -144,
+        -240
+      ],
+      "id": "4eaa6cfb-00eb-4dea-972b-0d731c94bbc7",
+      "name": "Manager"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Manager",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Manager",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manager": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "5dd66b34-e9a0-4b4c-87ee-c9476cd6c1a2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ada5bffac26132224180e7ae95041d80fdc3d37610db6f3137c83ce8199900d3"
+  },
+  "id": "RwWJts84fHtXdBCU",
+  "tags": []
+}
