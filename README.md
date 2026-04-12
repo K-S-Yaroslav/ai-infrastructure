@@ -1,6 +1,6 @@
 markdown
 
-#Локальная AI-инфраструктура с Multi-Agent системой
+# Локальная AI-инфраструктура с Multi-Agent системой
 
 [![Status](https://img.shields.io/badge/status-active-success.svg)]()
 [![Platform](https://img.shields.io/badge/platform-WSL2%20%7C%20Docker-blue)]()
