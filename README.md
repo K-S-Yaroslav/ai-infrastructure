@@ -4,6 +4,7 @@
 [![Status](https://img.shields.io/badge/status-MVP_completed-blue.svg)]()
 [![Platform](https://img.shields.io/badge/platform-WSL2%20%7C%20Docker-blue)]()
 [![GPU](https://img.shields.io/badge/GPU-RTX%203050%208GB-green)]()
+[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 Полностью локальная (self-hosted) система для работы ИИ-агентов с Multi-Agent архитектурой. Управление через Telegram-бота. Все вычисления происходят на локальном GPU, данные не покидают компьютер.
 
@@ -18,7 +19,7 @@ Telegram Bot
 n8n (оркестратор)
       ↓
 Multi-Agent цепочка:
-Manager → Worker → Corrector → Critic
+Manager → Worker → Corrector
       ↓
 Ollama (Qwen2.5 7B + 1.5B)
       ↓
