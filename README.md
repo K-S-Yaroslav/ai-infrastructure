@@ -1,93 +1,104 @@
 
-# Локальная AI-инфраструктура с Multi-Agent системой
+# Local AI Infrastructure with Multi-Agent System
 
 [![Status](https://img.shields.io/badge/status-MVP_completed-blue.svg)]()
 [![Platform](https://img.shields.io/badge/platform-WSL2%20%7C%20Docker-blue)]()
 [![GPU](https://img.shields.io/badge/GPU-RTX%203050%208GB-green)]()
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-Полностью локальная (self-hosted) система для работы ИИ-агентов с Multi-Agent архитектурой. Управление через Telegram-бота. Все вычисления происходят на локальном GPU, данные не покидают компьютер.
+> 📖 [Read in Russian / Читать на русском](README_RU.md)
 
-## Архитектура системы
+A fully local (self-hosted) system for running AI agents with Multi-Agent architecture. Controlled via Telegram bot. All computations run on local GPU, data never leaves the computer.
+
+## System Architecture
 
 ```text
 
 Telegram Bot
       ↓
-  ngrok (туннель)
+  ngrok (tunnel)
       ↓
-n8n (оркестратор)
+n8n (orchestrator)
       ↓
-Multi-Agent цепочка:
+Multi-Agent chain:
 Manager → Worker → Corrector
       ↓
 Ollama (Qwen2.5 7B + 1.5B)
       ↓
-PostgreSQL (хранение состояний)
+PostgreSQL (state storage)
 ```
-## Технологический стек
+### Agent Roles
 
-| Компонент | Технология | Назначение |
+| Агент | Модель | Задача |
+|-------|--------|--------|
+| **Manager** | Qwen2.5 7B | Analyzes request, creates response plan |
+| **Worker** | Qwen2.5 7B | Writes detailed response following the plan |
+| **Corrector** | Qwen2.5 1.5B | Fixes spelling and punctuation errors |
+
+## Tech Stack
+
+| Component | Technology  | Purpose  |
 |-----------|------------|------------|
-| **AI Models** | Qwen2.5 7B, Qwen2.5 1.5B | Генерация и коррекция текста |
-| **Inference** | Ollama + NVIDIA GPU | Локальный запуск LLM |
-| **Orchestration** | n8n | Управление цепочкой агентов |
-| **Database** | PostgreSQL | Хранение состояний n8n |
-| **Tunneling** | ngrok | Публичный доступ к локальному серверу |
-| **Platform** | WSL2 (Ubuntu) | Среда выполнения |
+| **AI Models** | Qwen2.5 7B, Qwen2.5 1.5B | Text generation and correction |
+| **Inference** | Ollama + NVIDIA GPU | Local LLM execution |
+| **Orchestration** | n8n | Agent chain management |
+| **Database** | PostgreSQL | n8n state storage |
+| **Tunneling** | ngrok | Public access to local server |
+| **Platform** | WSL2 (Ubuntu) | Runtime environment |
 
-## Быстрый старт
+## Quick Start
 
-### Требования
+### Requirements
 - Windows 11 с WSL2
 - Docker Desktop с NVIDIA Container Toolkit
 - NVIDIA GPU с 8+ ГБ VRAM
-- ngrok аккаунт
+- ngrok account (free tier)
 
-### Установка
+### Installation
 
 ```bash
-# Клонируйте репозиторий
+# Clone repository
 git clone https://github.com/K-S-Yaroslav/ai-infrastructure.git
 cd ai-infrastructure
 
-# Создайте .env файл
+# Create .env file
 cp .env.example .env
 nano .env  # Заполните свои данные
 
-# Запустите систему
-make up
+# Start system
+docker compose up -d
 
-# Загрузите модели
-make models
+# Download models
+docker exec ai_engine ollama pull qwen2.5:7b-instruct-q4_K_M
+docker exec ai_engine ollama pull qwen2.5:1.5b-instruct-q4_K_M
 ```
-## Производительность
+## Performance
 
-| Модель | VRAM | Tokens/s | Назначение|
+| Model | VRAM | Speed | Purpose |
 |--------|------|----------|-----------|
 | Qwen2.5 7B | 4.7 ГБ | ~36 | Manager, Worker |
-| Qwen2.5 1.5B | 0.9 ГБ | ~100+ токенов/сек | Corrector |
-### Железо: Ryzen 7 3700X, 64GB RAM, RTX 3050 8GB
+| Qwen2.5 1.5B | 0.9 ГБ | ~68+| Corrector |
+### Hardware: Ryzen 7 3700X, 64GB RAM, RTX 3050 8GB
 
-## Структура проекта
+## Project Structure
 ```text
 .
-├── docker-compose.yml    # Основной конфиг сервисов
-├── Makefile              # Команды управления
-├── .env.example          # Шаблон переменных
-├── configs/              # Конфигурационные файлы
-│   ├── n8n/              # Workflows n8n
-└── scripts/              # Скрипты автоматизации
+├── docker-compose.yml    # Main service config
+├── Makefile              # Management commands
+├── .env.example          # Environment template
+├── configs/              # Configuration files
+│   ├── n8n/              # n8n workflows
+└── scripts/              # Automation scripts
 ```
 
 ## Roadmap
 
-- Базовая инфраструктура (Docker + Ollama + n8n)
-- Простой Telegram бот
-- Multi-Agent система (Manager → Worker → Corrector)
+- Basic infrastructure (Docker + Ollama + n8n)
+- Simple Telegram bot
+- Multi-Agent system (Manager → Worker → Corrector)
 
-## Автор
+## Author
 `K-S-Yaroslav` — GitHub
 
-## Лицензия
+## License
 [MIT](LICENSE) © 2026 Yaroslav
